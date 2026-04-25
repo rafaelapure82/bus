@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: bus-postgres
+    environment:
+      POSTGRES_USER: bus_admin
+      POSTGRES_PASSWORD: bus_password
+      POSTGRES_DB: bus_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    container_name: bus-redis
+    ports:
+      - "6389:6379"
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bus-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://bus_admin:bus_password@postgres:5432/bus_db
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=super_secret_jwt_key
+      - PORT=3000
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bus-frontend
+    ports:
+      - "4200:4200"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+
+volumes:
+  pgdata:

@@ -1,0 +1,1264 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model abouts {
+  id          Int       @id @default(autoincrement())
+  title       String
+  sub_title   String
+  description String
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model accounthead {
+  id       Int     @id @default(autoincrement())
+  name     String?
+  parentid String?
+  chield   Int?
+}
+
+model accounts {
+  id             Int       @id @default(autoincrement())
+  type           String
+  detail         String?
+  amount         String
+  doc_location   String?
+  system_user_id Int?
+  created_at     DateTime? @default(now())
+  updated_at     DateTime? @default(now())
+  deleted_at     DateTime?
+}
+
+model adds {
+  id         Int       @id @default(autoincrement())
+  image_path String
+  pagename   String
+  link       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model agentcommissions {
+  id         Int       @id @default(autoincrement())
+  agent_id   Int
+  booking_id String
+  subtrip_id Int
+  user_id    Int
+  grandtotal String
+  commission String
+  rate       String
+  detail     String
+  date       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+  agents     agents    @relation(fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subtrips   subtrips  @relation(fields: [subtrip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([agent_id])
+  @@index([subtrip_id])
+  @@index([user_id])
+}
+
+model agents {
+  id               Int                @id @default(autoincrement())
+  location_id      Int
+  country_id       Int
+  user_id          Int
+  first_name       String
+  last_name        String
+  blood            String?
+  id_number        String?            @unique
+  id_type          String?
+  nid_picture      String?
+  commission       String
+  profile_picture  String?
+  address          String
+  city             String?
+  zip              String?
+  discount         Float?             @default(0)
+  created_at       DateTime?          @default(now())
+  updated_at       DateTime?          @default(now())
+  deleted_at       DateTime?
+  agentcommissions agentcommissions[]
+  country          country            @relation(fields: [country_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations        locations          @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users            users              @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  agenttotals      agenttotals[]
+  payagents        payagents[]
+
+  @@index([country_id])
+  @@index([location_id])
+  @@index([user_id])
+}
+
+model agenttotals {
+  id         Int       @id @default(autoincrement())
+  agent_id   Int
+  booking_id String?
+  income     String?
+  expense    String?
+  detail     String?
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+  agents     agents    @relation(fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([agent_id])
+}
+
+model blog {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  title       String
+  description String
+  image       String
+  serial      Int
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+  user        user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+}
+
+model blogs {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  title       String
+  description String
+  image       String
+  serial      Int
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+  users       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+}
+
+model cancels {
+  id             Int       @id @default(autoincrement())
+  booking_id     String
+  cancel_fee     String?
+  pay_type_id    String?
+  track_table_id String?
+  type           String
+  detail         String?
+  cancel_by      Int
+  created_at     DateTime? @default(now())
+  updated_at     DateTime? @default(now())
+  deleted_at     DateTime?
+  users          users     @relation(fields: [cancel_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([cancel_by])
+}
+
+model cookes {
+  id          Int       @id @default(autoincrement())
+  title       String
+  sub_title   String
+  description String
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model country {
+  id        Int         @id @default(autoincrement())
+  iso       String
+  name      String
+  nicename  String
+  iso3      String?
+  numcode   Int?
+  phonecode Int
+  agents    agents[]
+  employees employees[]
+}
+
+model coupondiscounts {
+  id         Int       @id @default(autoincrement())
+  code       String
+  coupon_id  Int
+  booking_id String
+  subtrip_id Int
+  amount     String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+  coupons    coupons   @relation(fields: [coupon_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subtrips   subtrips  @relation(fields: [subtrip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([coupon_id])
+  @@index([subtrip_id])
+}
+
+model coupons {
+  id              Int               @id @default(autoincrement())
+  subtrip_id      Int
+  code            String
+  start_date      String
+  end_date        String
+  discount        String
+  condition       String?
+  created_at      DateTime?         @default(now())
+  updated_at      DateTime?         @default(now())
+  deleted_at      DateTime?
+  coupondiscounts coupondiscounts[]
+}
+
+model currencies {
+  id         Int    @id @default(autoincrement())
+  country    String
+  currency   String
+  code       String
+  minor_unit Int
+  symbol     String
+}
+
+model emails {
+  id         Int       @id @default(autoincrement())
+  protocol   String
+  smtphost   String
+  smtpuser   String
+  smtppass   String
+  smtpport   String
+  smtpcrypto String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model employees {
+  id              Int            @id @default(autoincrement())
+  employeetype_id Int
+  country_id      Int
+  first_name      String
+  last_name       String
+  phone           String
+  email           String         @unique
+  blood           String
+  id_type         String?
+  nid             String?        @unique
+  nid_picture     String
+  profile_picture String
+  address         String
+  city            String
+  zip             String
+  created_at      DateTime?      @default(now())
+  updated_at      DateTime?      @default(now())
+  deleted_at      DateTime?
+  country         country        @relation(fields: [country_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employeetypes   employeetypes  @relation(fields: [employeetype_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  stuffassigns    stuffassigns[]
+
+  @@index([country_id])
+  @@index([employeetype_id])
+}
+
+model employeetypes {
+  id         Int         @id @default(autoincrement())
+  type       String
+  detail     String
+  created_at DateTime?   @default(now())
+  updated_at DateTime?   @default(now())
+  deleted_at DateTime?
+  employees  employees[]
+}
+
+model facilitys {
+  id         Int       @id @default(autoincrement())
+  name       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model faqquestions {
+  id          Int       @id @default(autoincrement())
+  question    String
+  description String
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model faqs {
+  id         Int       @id @default(autoincrement())
+  title      String
+  sub_title  String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model fitnesses {
+  id           Int       @id @default(autoincrement())
+  vehicle_id   Int
+  fitness_name String
+  start_date   String
+  end_date     String
+  start_milage String
+  end_milage   String?
+  created_at   DateTime? @default(now())
+  updated_at   DateTime? @default(now())
+  deleted_at   DateTime?
+}
+
+model fleets {
+  id              Int        @id @default(autoincrement())
+  type            String
+  layout          String
+  last_seat       String
+  total_seat      Int
+  seat_number     String
+  status          String
+  luggage_service String
+  created_at      DateTime?  @default(now())
+  updated_at      DateTime?  @default(now())
+  deleted_at      DateTime?
+  trips           trips[]
+  vehicles        vehicles[]
+}
+
+model flutterwaves {
+  id                  Int       @id @default(autoincrement())
+  live_public_key     String
+  live_secret_key     String
+  live_encryption_key String
+  test_public_key     String
+  test_secret_key     String
+  test_encryption_key String
+  environment         Int
+  created_at          DateTime? @default(now())
+  updated_at          DateTime? @default(now())
+  deleted_at          DateTime?
+}
+
+model fonts {
+  id           Int    @id @default(autoincrement())
+  font_name    String
+  font_display String
+}
+
+model footers {
+  id         Int       @id @default(autoincrement())
+  contact    String
+  email      String
+  opentime   String
+  address    String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model gatewaytotals {
+  id              Int             @id @default(autoincrement())
+  booking_id      String
+  gateway_id      Int
+  amount          String
+  detail          String?
+  trip_id         Int
+  subtrip_id      Int
+  user_id         Int
+  created_at      DateTime?       @default(now())
+  updated_at      DateTime?       @default(now())
+  deleted_at      DateTime?
+  paymentgateways paymentgateways @relation(fields: [gateway_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subtrips        subtrips        @relation(fields: [subtrip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  trips           trips           @relation(fields: [trip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([gateway_id])
+  @@index([subtrip_id])
+  @@index([trip_id])
+  @@index([user_id])
+}
+
+model inquiries {
+  id         Int       @id @default(autoincrement())
+  mobile     String
+  subject    String
+  message    String
+  email      String
+  name       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model journeylists {
+  id                                                 Int       @id @default(autoincrement())
+  booking_id                                         String
+  trip_id                                            Int
+  subtrip_id                                         Int
+  pick_location_id                                   Int
+  drop_location_id                                   Int
+  pick_stand_id                                      Int
+  drop_stand_id                                      Int
+  first_name                                         String
+  last_name                                          String
+  phone                                              String?
+  journeydate                                        String
+  id_number                                          String
+  created_at                                         DateTime? @default(now())
+  updated_at                                         DateTime? @default(now())
+  deleted_at                                         DateTime?
+  locations_journeylists_drop_location_idTolocations locations @relation("journeylists_drop_location_idTolocations", fields: [drop_location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pickdrops_journeylists_drop_stand_idTopickdrops    pickdrops @relation("journeylists_drop_stand_idTopickdrops", fields: [drop_stand_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations_journeylists_pick_location_idTolocations locations @relation("journeylists_pick_location_idTolocations", fields: [pick_location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pickdrops_journeylists_pick_stand_idTopickdrops    pickdrops @relation("journeylists_pick_stand_idTopickdrops", fields: [pick_stand_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subtrips                                           subtrips  @relation(fields: [subtrip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  trips                                              trips     @relation(fields: [trip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([drop_location_id])
+  @@index([drop_stand_id])
+  @@index([pick_location_id])
+  @@index([pick_stand_id])
+  @@index([subtrip_id])
+  @@index([trip_id])
+}
+
+model langstrings {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  created_at    DateTime?       @default(now())
+  updated_at    DateTime?       @default(now())
+  deleted_at    DateTime?
+  lngstngvalues lngstngvalues[]
+}
+
+model languages {
+  id      Int    @id @default(autoincrement())
+  name    String
+  lngcode String
+}
+
+model lngstngvalues {
+  id          Int         @id @default(autoincrement())
+  string_id   Int
+  localize_id Int
+  value       String?
+  created_at  DateTime?   @default(now())
+  updated_at  DateTime?   @default(now())
+  deleted_at  DateTime?
+  localizes   localizes   @relation(fields: [localize_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  langstrings langstrings @relation(fields: [string_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([localize_id])
+  @@index([string_id])
+}
+
+model localizes {
+  id            Int             @id @default(autoincrement())
+  name          String
+  display_name  String
+  language_code String
+  created_at    DateTime?       @default(now())
+  updated_at    DateTime?       @default(now())
+  deleted_at    DateTime?
+  lngstngvalues lngstngvalues[]
+}
+
+model locations {
+  id                                                    Int            @id @default(autoincrement())
+  name                                                  String
+  created_at                                            DateTime?      @default(now())
+  updated_at                                            DateTime?      @default(now())
+  deleted_at                                            DateTime?
+  agents                                                agents[]
+  journeylists_journeylists_drop_location_idTolocations journeylists[] @relation("journeylists_drop_location_idTolocations")
+  journeylists_journeylists_pick_location_idTolocations journeylists[] @relation("journeylists_pick_location_idTolocations")
+  tickets_tickets_drop_location_idTolocations           tickets[]      @relation("tickets_drop_location_idTolocations")
+  tickets_tickets_pick_location_idTolocations           tickets[]      @relation("tickets_pick_location_idTolocations")
+  trips_trips_drop_location_idTolocations               trips[]        @relation("trips_drop_location_idTolocations")
+  trips_trips_pick_location_idTolocations               trips[]        @relation("trips_pick_location_idTolocations")
+}
+
+model maxtimes {
+  id         Int       @id @default(autoincrement())
+  maxtime    String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model menus {
+  id             Int           @id @default(autoincrement())
+  menu_title     String
+  page_url       String
+  module_name    String
+  parent_menu_id String?
+  have_chield    String?
+  created_by     String
+  created_at     DateTime?     @default(now())
+  updated_at     DateTime?     @default(now())
+  deleted_at     DateTime?
+  permissions    permissions[]
+}
+
+model migrations {
+  id        BigInt @id @default(autoincrement())
+  version   String
+  class     String
+  group     String
+  namespace String
+  time      Int
+  batch     Int
+}
+
+model partialpaids {
+  id             Int       @id @default(autoincrement())
+  booking_id     String
+  trip_id        Int
+  subtrip_id     Int
+  passanger_id   Int
+  paidamount     String
+  pay_type_id    Int?
+  pay_method_id  Int?
+  payment_detail String?
+  created_at     DateTime? @default(now())
+  updated_at     DateTime? @default(now())
+  deleted_at     DateTime?
+  users          users     @relation(fields: [passanger_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subtrips       subtrips  @relation(fields: [subtrip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  trips          trips     @relation(fields: [trip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([passanger_id])
+  @@index([subtrip_id])
+  @@index([trip_id])
+}
+
+model payagents {
+  id          Int       @id @default(autoincrement())
+  agent_id    Int
+  amount      String?
+  status      String?
+  approved_id Int?
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+  agents      agents    @relation(fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([agent_id])
+}
+
+model paymentgateways {
+  id            Int             @id @default(autoincrement())
+  name          String
+  status        String
+  created_at    DateTime?       @default(now())
+  updated_at    DateTime?       @default(now())
+  deleted_at    DateTime?
+  gatewaytotals gatewaytotals[]
+}
+
+model paymethods {
+  id              Int               @id @default(autoincrement())
+  name            String
+  status          String
+  created_at      DateTime?         @default(now())
+  updated_at      DateTime?         @default(now())
+  deleted_at      DateTime?
+  paymethodtotals paymethodtotals[]
+}
+
+model paymethodtotals {
+  id           Int        @id @default(autoincrement())
+  booking_id   String
+  paymethod_id Int
+  amount       String
+  detail       String?
+  trip_id      Int
+  subtrip_id   Int
+  user_id      Int
+  created_at   DateTime?  @default(now())
+  updated_at   DateTime?  @default(now())
+  deleted_at   DateTime?
+  paymethods   paymethods @relation(fields: [paymethod_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subtrips     subtrips   @relation(fields: [subtrip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  trips        trips      @relation(fields: [trip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users        users      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([paymethod_id])
+  @@index([subtrip_id])
+  @@index([trip_id])
+  @@index([user_id])
+}
+
+model paypals {
+  id          Int       @id @default(autoincrement())
+  test_c_kye  String
+  test_s_kye  String
+  live_c_kye  String
+  live_s_kye  String
+  environment String
+  email       String
+  marchantid  String?
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model paystacks {
+  id          Int       @id @default(autoincrement())
+  test_p_kye  String
+  test_s_kye  String
+  live_p_kye  String
+  live_s_kye  String
+  environment String
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model permissions {
+  id         Int       @id @default(autoincrement())
+  role_id    Int
+  user_id    Int
+  menu_id    Int
+  menu_title String?
+  create     String?
+  read       String?
+  edit       String?
+  delete     String?
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+  menus      menus     @relation(fields: [menu_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  roles      roles     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([menu_id])
+  @@index([role_id])
+  @@index([user_id])
+}
+
+model pickdrops {
+  id                                                 Int            @id @default(autoincrement())
+  trip_id                                            Int
+  stand_id                                           Int
+  time                                               String
+  type                                               Int
+  detail                                             String
+  created_at                                         DateTime?      @default(now())
+  updated_at                                         DateTime?      @default(now())
+  deleted_at                                         DateTime?
+  journeylists_journeylists_drop_stand_idTopickdrops journeylists[] @relation("journeylists_drop_stand_idTopickdrops")
+  journeylists_journeylists_pick_stand_idTopickdrops journeylists[] @relation("journeylists_pick_stand_idTopickdrops")
+  stands                                             stands         @relation(fields: [stand_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  trips                                              trips          @relation(fields: [trip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tickets_tickets_drop_stand_idTopickdrops           tickets[]      @relation("tickets_drop_stand_idTopickdrops")
+  tickets_tickets_pick_stand_idTopickdrops           tickets[]      @relation("tickets_pick_stand_idTopickdrops")
+
+  @@index([stand_id])
+  @@index([trip_id])
+}
+
+model privacies {
+  id          Int       @id @default(autoincrement())
+  title       String
+  sub_title   String
+  description String
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model ratings {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  trip_id    Int
+  subtrip_id Int
+  booking_id String    @unique
+  comments   String?
+  rating     Float
+  status     String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+  subtrips   subtrips  @relation(fields: [subtrip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  trips      trips     @relation(fields: [trip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([subtrip_id])
+  @@index([trip_id])
+  @@index([user_id])
+}
+
+model razors {
+  id          Int       @id @default(autoincrement())
+  test_s_kye  String
+  live_s_kye  String
+  environment String
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model refunds {
+  id             Int       @id @default(autoincrement())
+  booking_id     String
+  refund_fee     String?
+  pay_type_id    String?
+  track_table_id String?
+  type           String
+  detail         String?
+  refund_by      Int
+  created_at     DateTime? @default(now())
+  updated_at     DateTime? @default(now())
+  deleted_at     DateTime?
+  users          users     @relation(fields: [refund_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([refund_by])
+}
+
+model roles {
+  id          Int           @id @default(autoincrement())
+  name        String
+  status      String
+  created_at  DateTime?     @default(now())
+  updated_at  DateTime?     @default(now())
+  deleted_at  DateTime?
+  permissions permissions[]
+  users       users[]
+}
+
+model roundtripdiscounds {
+  id           Int       @id @default(autoincrement())
+  name         String?
+  discountrate Int
+  status       Int
+  created_at   DateTime? @default(now())
+  updated_at   DateTime? @default(now())
+  deleted_at   DateTime?
+}
+
+model schedulefilters {
+  id         Int       @id @default(autoincrement())
+  start_time String
+  end_time   String
+  type       Int
+  detail     String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model schedules {
+  id         Int       @id @default(autoincrement())
+  start_time String
+  end_time   String
+  status     String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+  trips      trips[]
+}
+
+model section_five_app {
+  id                Int       @id @default(autoincrement())
+  title             String
+  sub_title         String
+  image             String
+  button_one_status Int
+  button_one_link   String
+  button_two_status Int
+  button_two_link   String
+  created_at        DateTime? @default(now())
+  updated_at        DateTime? @default(now())
+  deleted_at        DateTime?
+}
+
+model section_four_comment {
+  id         Int       @id @default(autoincrement())
+  title      String
+  sub_title  String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model section_four_detail {
+  id            Int       @id @default(autoincrement())
+  person_name   String
+  description   String
+  person_detail String
+  image         String?
+  serial        Int
+  created_at    DateTime? @default(now())
+  updated_at    DateTime? @default(now())
+  deleted_at    DateTime?
+}
+
+model section_one_home {
+  id          Int       @id @default(autoincrement())
+  title       String
+  sub_title   String
+  button_text String
+  image       String?
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model section_seven_subscrib {
+  id         Int       @id @default(autoincrement())
+  title      String
+  sub_title  String
+  image      String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model section_six_blog {
+  id         Int       @id @default(autoincrement())
+  title      String
+  sub_title  String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model section_three_heading {
+  id         Int       @id @default(autoincrement())
+  title      String
+  sub_title  String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model section_two_detail {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  button_text String
+  image       String?
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model section_two_work_flow {
+  id         Int       @id @default(autoincrement())
+  title      String
+  sub_title  String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model social {
+  id         Int       @id @default(autoincrement())
+  image      String
+  link       String
+  serial     Int
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model socialmedias {
+  id         Int       @id @default(autoincrement())
+  image_path String
+  link       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model socialsignins {
+  id         Int       @id @default(autoincrement())
+  appid      String
+  email      String
+  other      String?
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model ssl_commerz {
+  id                 Int    @id @default(autoincrement())
+  ssl_store_id       String
+  ssl_store_password String
+  environment        Int
+}
+
+model stands {
+  id         Int         @id @default(autoincrement())
+  name       String
+  created_at DateTime?   @default(now())
+  updated_at DateTime?   @default(now())
+  deleted_at DateTime?
+  pickdrops  pickdrops[]
+}
+
+model stripes {
+  id          Int       @id @default(autoincrement())
+  test_p_kye  String
+  test_s_kye  String
+  live_p_kye  String
+  live_s_kye  String
+  environment String
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model stuffassigns {
+  id            Int       @id @default(autoincrement())
+  trip_id       Int
+  employee_id   Int
+  employee_type String
+  created_at    DateTime? @default(now())
+  updated_at    DateTime? @default(now())
+  deleted_at    DateTime?
+  employees     employees @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  trips         trips     @relation(fields: [trip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([employee_id])
+  @@index([trip_id])
+}
+
+model subscribes {
+  id         Int       @id @default(autoincrement())
+  email      String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model subtrips {
+  id               Int                @id @default(autoincrement())
+  trip_id          Int
+  pick_location_id Int
+  drop_location_id Int
+  stoppage         String?
+  adult_fair       String
+  child_fair       String?
+  special_fair     String?
+  type             String
+  show             String?
+  imglocation      String?
+  status           String
+  created_at       DateTime?          @default(now())
+  updated_at       DateTime?          @default(now())
+  deleted_at       DateTime?
+  agentcommissions agentcommissions[]
+  coupondiscounts  coupondiscounts[]
+  gatewaytotals    gatewaytotals[]
+  journeylists     journeylists[]
+  partialpaids     partialpaids[]
+  paymethodtotals  paymethodtotals[]
+  ratings          ratings[]
+  trips            trips              @relation(fields: [trip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  temporarybooks   temporarybooks[]
+  tickets          tickets[]
+
+  @@index([trip_id])
+}
+
+model taxes {
+  id         Int       @id @default(autoincrement())
+  name       String
+  tax_reg    String
+  status     String
+  value      String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+}
+
+model temporarybooks {
+  id           Int       @id @default(autoincrement())
+  subtrip_id   Int
+  ticket_token String
+  seat_names   String
+  journey_date DateTime?
+  created_at   DateTime? @default(now())
+  expires_at   DateTime?
+  deleted_at   DateTime?
+  subtrips     subtrips  @relation(fields: [subtrip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([subtrip_id])
+}
+
+model terms {
+  id          Int       @id @default(autoincrement())
+  title       String
+  sub_title   String
+  description String
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  deleted_at  DateTime?
+}
+
+model tickets {
+  id                                            Int       @id @default(autoincrement())
+  booking_id                                    String    @unique
+  trip_id                                       Int
+  subtrip_id                                    Int
+  passanger_id                                  Int
+  pick_location_id                              Int
+  drop_location_id                              Int
+  pick_stand_id                                 Int
+  drop_stand_id                                 Int
+  price                                         String
+  discount                                      String?
+  roundtrip_discount                            String?
+  totaltax                                      String?
+  paidamount                                    String
+  offerer                                       String?
+  adult                                         String?
+  chield                                        String?
+  special                                       String?
+  seatnumber                                    String
+  totalseat                                     String
+  refund                                        String?
+  bookby_user_id                                Int
+  bookby_user_type                              String?
+  journeydata                                   DateTime
+  pay_type_id                                   Int?
+  pay_method_id                                 Int?
+  payment_status                                String
+  vehicle_id                                    Int
+  payment_detail                                String?
+  cancel_status                                 String?
+  created_at                                    DateTime? @default(now())
+  updated_at                                    DateTime? @default(now())
+  deleted_at                                    DateTime?
+  users_tickets_bookby_user_idTousers           users     @relation("tickets_bookby_user_idTousers", fields: [bookby_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations_tickets_drop_location_idTolocations locations @relation("tickets_drop_location_idTolocations", fields: [drop_location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pickdrops_tickets_drop_stand_idTopickdrops    pickdrops @relation("tickets_drop_stand_idTopickdrops", fields: [drop_stand_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_tickets_passanger_idTousers             users     @relation("tickets_passanger_idTousers", fields: [passanger_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations_tickets_pick_location_idTolocations locations @relation("tickets_pick_location_idTolocations", fields: [pick_location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pickdrops_tickets_pick_stand_idTopickdrops    pickdrops @relation("tickets_pick_stand_idTopickdrops", fields: [pick_stand_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subtrips                                      subtrips  @relation(fields: [subtrip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  trips                                         trips     @relation(fields: [trip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  vehicles                                      vehicles  @relation(fields: [vehicle_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([bookby_user_id])
+  @@index([drop_location_id])
+  @@index([drop_stand_id])
+  @@index([passanger_id])
+  @@index([pick_location_id])
+  @@index([pick_stand_id])
+  @@index([subtrip_id])
+  @@index([trip_id])
+  @@index([vehicle_id])
+}
+
+model timezone {
+  id           Int    @id @default(autoincrement())
+  country_code String
+  timezone     String
+  gmt_offset   Float?
+  dst_offset   Float?
+  raw_offset   Float?
+}
+
+model trips {
+  id                                          Int               @id @default(autoincrement())
+  fleet_id                                    Int
+  schedule_id                                 Int
+  pick_location_id                            Int
+  drop_location_id                            Int
+  vehicle_id                                  Int
+  distance                                    String?
+  startdate                                   DateTime
+  journey_hour                                String?
+  child_seat                                  String?
+  special_seat                                String
+  adult_fair                                  String
+  child_fair                                  String?
+  special_fair                                String?
+  weekend                                     String?
+  company_name                                String
+  stoppage                                    String?
+  facility                                    String?
+  status                                      String
+  created_at                                  DateTime?         @default(now())
+  updated_at                                  DateTime?         @default(now())
+  deleted_at                                  DateTime?
+  gatewaytotals                               gatewaytotals[]
+  journeylists                                journeylists[]
+  partialpaids                                partialpaids[]
+  paymethodtotals                             paymethodtotals[]
+  pickdrops                                   pickdrops[]
+  ratings                                     ratings[]
+  stuffassigns                                stuffassigns[]
+  subtrips                                    subtrips[]
+  tickets                                     tickets[]
+  locations_trips_drop_location_idTolocations locations         @relation("trips_drop_location_idTolocations", fields: [drop_location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fleets                                      fleets            @relation(fields: [fleet_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations_trips_pick_location_idTolocations locations         @relation("trips_pick_location_idTolocations", fields: [pick_location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  schedules                                   schedules         @relation(fields: [schedule_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  vehicles                                    vehicles          @relation(fields: [vehicle_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([drop_location_id])
+  @@index([fleet_id])
+  @@index([pick_location_id])
+  @@index([schedule_id])
+  @@index([vehicle_id])
+}
+
+model user {
+  id            Int           @id @default(autoincrement())
+  login_email   String        @unique
+  login_mobile  String        @unique
+  password      String
+  slug          String        @unique
+  recovery_code String?
+  last_login    String
+  ip            String?
+  role          Int
+  status        String
+  created_at    DateTime?     @default(now())
+  updated_at    DateTime?     @default(now())
+  deleted_at    DateTime?
+  blog          blog[]
+  user_detail   user_detail[]
+}
+
+model user_detail {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  first_name String
+  last_name  String
+  id_number  String    @unique
+  id_type    String
+  image      String?
+  address    String?
+  country    Int
+  city       String?
+  zip_code   String?
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+  user       user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+}
+
+model user_details {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  first_name String
+  last_name  String
+  id_number  String?   @unique
+  id_type    String?
+  image      String?
+  address    String?
+  country_id Int
+  city       String?
+  zip_code   String?
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+}
+
+model users {
+  id                                    Int                @id @default(autoincrement())
+  login_email                           String             @unique
+  login_mobile                          String
+  password                              String
+  recovery_code                         String?
+  slug                                  String             @unique
+  last_login                            DateTime?
+  ip                                    String?
+  role_id                               Int
+  status                                String
+  created_at                            DateTime?          @default(now())
+  updated_at                            DateTime?          @default(now())
+  deleted_at                            DateTime?
+  agentcommissions                      agentcommissions[]
+  agents                                agents[]
+  blogs                                 blogs[]
+  cancels                               cancels[]
+  gatewaytotals                         gatewaytotals[]
+  partialpaids                          partialpaids[]
+  paymethodtotals                       paymethodtotals[]
+  permissions                           permissions[]
+  ratings                               ratings[]
+  refunds                               refunds[]
+  tickets_tickets_bookby_user_idTousers tickets[]          @relation("tickets_bookby_user_idTousers")
+  tickets_tickets_passanger_idTousers   tickets[]          @relation("tickets_passanger_idTousers")
+  user_details                          user_details[]
+  roles                                 roles              @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([role_id])
+}
+
+model vehicalimages {
+  id         Int       @id @default(autoincrement())
+  vehicle_id Int
+  img_path   String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+  vehicles   vehicles  @relation(fields: [vehicle_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([vehicle_id])
+}
+
+model vehicles {
+  id            Int             @id @default(autoincrement())
+  reg_no        String          @unique
+  fleet_id      Int
+  engine_no     String
+  model_no      String
+  chasis_no     String
+  woner         String
+  woner_mobile  String
+  company       String
+  status        String
+  assign        String
+  created_at    DateTime?       @default(now())
+  updated_at    DateTime?       @default(now())
+  deleted_at    DateTime?
+  tickets       tickets[]
+  trips         trips[]
+  vehicalimages vehicalimages[]
+  fleets        fleets          @relation(fields: [fleet_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([fleet_id])
+}
+
+model websettings {
+  id                Int       @id @default(autoincrement())
+  localize_name     String
+  headerlogo        String
+  favicon           String
+  footerlogo        String
+  logotext          String
+  apptitle          String
+  copyright         String
+  headercolor       String
+  footercolor       String
+  bottomfootercolor String
+  buttoncolor       String
+  buttoncolorhover  String
+  buttontextcolor   String
+  fontfamely        String
+  tax_type          String
+  country           Int?
+  timezone          String?
+  max_ticket        Int
+  currency          Int
+  created_at        DateTime? @default(now())
+  updated_at        DateTime? @default(now())
+  deleted_at        DateTime?
+}
