@@ -2,7 +2,11 @@ import prisma from '../../config/prisma';
 
 export class TicketsService {
   async findAll() {
-    return prisma.tickets.findMany();
+    return prisma.tickets.findMany({
+      include: {
+        passangers: true
+      }
+    });
   }
 
   async findById(id: number) {

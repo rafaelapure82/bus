@@ -1,9 +1,11 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model abouts {
@@ -248,14 +250,19 @@ model employees {
   blood           String
   id_type         String?
   nid             String?        @unique
-  nid_picture     String
-  profile_picture String
+  nid_picture     String?
+  license_picture String?
+  circulation_picture String?
+  vehicle_papers_picture String?
+  vehicle_type    String?
+  profile_picture String?
   address         String
   city            String
   zip             String
   created_at      DateTime?      @default(now())
   updated_at      DateTime?      @default(now())
   deleted_at      DateTime?
+  trips           trips[]
   country         country        @relation(fields: [country_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeetypes   employeetypes  @relation(fields: [employeetype_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   stuffassigns    stuffassigns[]
@@ -1040,7 +1047,7 @@ model tickets {
   users_tickets_bookby_user_idTousers           users     @relation("tickets_bookby_user_idTousers", fields: [bookby_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   locations_tickets_drop_location_idTolocations locations @relation("tickets_drop_location_idTolocations", fields: [drop_location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   pickdrops_tickets_drop_stand_idTopickdrops    pickdrops @relation("tickets_drop_stand_idTopickdrops", fields: [drop_stand_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users_tickets_passanger_idTousers             users     @relation("tickets_passanger_idTousers", fields: [passanger_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  passangers                                    passangers @relation(fields: [passanger_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   locations_tickets_pick_location_idTolocations locations @relation("tickets_pick_location_idTolocations", fields: [pick_location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   pickdrops_tickets_pick_stand_idTopickdrops    pickdrops @relation("tickets_pick_stand_idTopickdrops", fields: [pick_stand_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   subtrips                                      subtrips  @relation(fields: [subtrip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -1057,6 +1064,20 @@ model tickets {
   @@index([trip_id])
   @@index([vehicle_id])
 }
+
+model passangers {
+  id         Int       @id @default(autoincrement())
+  first_name String
+  last_name  String
+  mobile     String
+  email      String
+  status     String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  deleted_at DateTime?
+  tickets    tickets[]
+}
+
 
 model timezone {
   id           Int    @id @default(autoincrement())
@@ -1087,6 +1108,8 @@ model trips {
   stoppage                                    String?
   facility                                    String?
   status                                      String
+  driver_id                                   Int?
+  employees                                   employees?        @relation(fields: [driver_id], references: [id])
   created_at                                  DateTime?         @default(now())
   updated_at                                  DateTime?         @default(now())
   deleted_at                                  DateTime?
@@ -1180,6 +1203,10 @@ model users {
   last_login                            DateTime?
   ip                                    String?
   role_id                               Int
+  profile_image                         String?
+  profile_banner                        String?
+
+
   status                                String
   created_at                            DateTime?          @default(now())
   updated_at                            DateTime?          @default(now())
@@ -1195,7 +1222,6 @@ model users {
   ratings                               ratings[]
   refunds                               refunds[]
   tickets_tickets_bookby_user_idTousers tickets[]          @relation("tickets_bookby_user_idTousers")
-  tickets_tickets_passanger_idTousers   tickets[]          @relation("tickets_passanger_idTousers")
   user_details                          user_details[]
   roles                                 roles              @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 

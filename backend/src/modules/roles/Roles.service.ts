@@ -2,7 +2,13 @@ import prisma from '../../config/prisma';
 
 export class RolesService {
   async findAll() {
-    return prisma.roles.findMany();
+    return prisma.roles.findMany({
+      include: {
+        _count: {
+          select: { users: true }
+        }
+      }
+    });
   }
 
   async findById(id: number) {

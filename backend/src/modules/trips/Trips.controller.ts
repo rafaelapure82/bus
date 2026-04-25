@@ -34,7 +34,15 @@ export class TripsController {
 
   update = async (req: Request, res: Response) => {
     try {
-      const updatedTrip = await this.tripsService.update(Number(req.params.id), req.body);
+      const data = { ...req.body };
+      if (data.fleet_id) data.fleet_id = Number(data.fleet_id);
+      if (data.schedule_id) data.schedule_id = Number(data.schedule_id);
+      if (data.pick_location_id) data.pick_location_id = Number(data.pick_location_id);
+      if (data.drop_location_id) data.drop_location_id = Number(data.drop_location_id);
+      if (data.vehicle_id) data.vehicle_id = Number(data.vehicle_id);
+      if (data.driver_id) data.driver_id = Number(data.driver_id);
+
+      const updatedTrip = await this.tripsService.update(Number(req.params.id), data);
       res.json(updatedTrip);
     } catch (error: any) {
       res.status(400).json({ error: error.message });

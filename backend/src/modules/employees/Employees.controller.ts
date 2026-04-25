@@ -25,7 +25,22 @@ export class EmployeesController {
 
   create = async (req: Request, res: Response) => {
     try {
-      const newEmployee = await this.employeesService.create(req.body);
+      const data = { ...req.body };
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+      if (files) {
+        if (files['profile_picture']) data.profile_picture = files['profile_picture'][0].path;
+        if (files['nid_picture']) data.nid_picture = files['nid_picture'][0].path;
+        if (files['license_picture']) data.license_picture = files['license_picture'][0].path;
+        if (files['circulation_picture']) data.circulation_picture = files['circulation_picture'][0].path;
+        if (files['vehicle_papers_picture']) data.vehicle_papers_picture = files['vehicle_papers_picture'][0].path;
+      }
+
+      // Convert string IDs to numbers if coming from form-data
+      if (data.employeetype_id) data.employeetype_id = Number(data.employeetype_id);
+      if (data.country_id) data.country_id = Number(data.country_id);
+
+      const newEmployee = await this.employeesService.create(data);
       res.status(201).json(newEmployee);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -34,7 +49,21 @@ export class EmployeesController {
 
   update = async (req: Request, res: Response) => {
     try {
-      const updatedEmployee = await this.employeesService.update(Number(req.params.id), req.body);
+      const data = { ...req.body };
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+      if (files) {
+        if (files['profile_picture']) data.profile_picture = files['profile_picture'][0].path;
+        if (files['nid_picture']) data.nid_picture = files['nid_picture'][0].path;
+        if (files['license_picture']) data.license_picture = files['license_picture'][0].path;
+        if (files['circulation_picture']) data.circulation_picture = files['circulation_picture'][0].path;
+        if (files['vehicle_papers_picture']) data.vehicle_papers_picture = files['vehicle_papers_picture'][0].path;
+      }
+
+      if (data.employeetype_id) data.employeetype_id = Number(data.employeetype_id);
+      if (data.country_id) data.country_id = Number(data.country_id);
+
+      const updatedEmployee = await this.employeesService.update(Number(req.params.id), data);
       res.json(updatedEmployee);
     } catch (error: any) {
       res.status(400).json({ error: error.message });

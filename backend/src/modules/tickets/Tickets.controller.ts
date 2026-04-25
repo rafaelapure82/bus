@@ -25,9 +25,13 @@ export class TicketsController {
 
   create = async (req: Request, res: Response) => {
     try {
+      console.log('--- CREATING TICKET ---');
+      console.log('Data:', JSON.stringify(req.body, null, 2));
       const newTicket = await this.ticketsService.create(req.body);
+      console.log('Ticket Created Successfully:', newTicket.id);
       res.status(201).json(newTicket);
     } catch (error: any) {
+      console.error('Ticket Creation Error:', error.message);
       res.status(400).json({ error: error.message });
     }
   };

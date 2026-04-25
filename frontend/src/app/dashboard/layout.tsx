@@ -1,15 +1,54 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Users, Shield, UserSquare, LayoutDashboard, MapPin, Bus, Calendar, Map, Ticket, Tag, Calculator, CreditCard, Wallet, LineChart, FileText, MessageSquare, Star, MessageCircle } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { Users, Shield, UserSquare, LayoutDashboard, MapPin, Bus, Calendar, Map, Ticket, Tag, Calculator, CreditCard, Wallet, LineChart, FileText, MessageSquare, Star, MessageCircle, LogOut } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [user, setUser] = useState<{name: string, role: string} | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (!token || !userData) {
+      router.push('/login');
+    } else {
+      setUser(JSON.parse(userData));
+    }
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
+  };
+
+  if (!user) return <div className="min-h-screen bg-neutral-50 flex items-center justify-center"><Bus className="w-12 h-12 text-[#800020] animate-bounce" /></div>;
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex">
       {/* Sidebar */}
       <aside className="w-64 bg-white/70 dark:bg-black/50 backdrop-blur-xl border-r border-neutral-200 dark:border-neutral-800 flex flex-col">
-        <div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
-          <h1 className="text-2xl font-bold text-primary dark:text-primary-light">Bus Admin</h1>
+        <div className="p-8 border-b border-neutral-200 dark:border-neutral-800 flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#800020] rounded-xl flex items-center justify-center text-white shadow-lg"><Bus className="w-6 h-6" /></div>
+          <h1 className="text-xl font-black text-neutral-800 dark:text-white tracking-tighter">Bus System</h1>
         </div>
+
+        <Link href="/dashboard/profile" className="px-6 py-8 border-b border-neutral-100 bg-neutral-50/50 hover:bg-neutral-100 transition-all block group">
+          <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-3">Sesión Activa</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white border border-neutral-200 flex items-center justify-center font-black text-[#800020] shadow-sm group-hover:scale-110 transition-all">{user.name.charAt(0).toUpperCase()}</div>
+            <div>
+              <p className="text-sm font-black text-neutral-800 tracking-tight group-hover:text-[#800020] transition-all">{user.name}</p>
+              <p className="text-[10px] font-bold text-[#800020] uppercase">{user.role}</p>
+            </div>
+          </div>
+        </Link>
+
         
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-neutral-700 dark:text-neutral-300 hover:text-primary transition-all">
@@ -62,6 +101,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Link href="/dashboard/trips" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-neutral-700 dark:text-neutral-300 hover:text-primary transition-all">
             <Map className="w-5 h-5" />
             <span className="font-medium">Viajes</span>
+          </Link>
+
+          <Link href="/dashboard/campesino" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#800020]/5 border border-[#800020]/10 text-[#800020] hover:bg-[#800020]/10 transition-all">
+            <Map className="w-5 h-5" />
+            <span className="font-medium font-bold">Transporte Campesino</span>
           </Link>
 
           <Link href="/dashboard/tickets" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 text-neutral-700 dark:text-neutral-300 hover:text-primary transition-all">
@@ -121,15 +165,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <MessageCircle className="w-5 h-5" />
             <span className="font-medium">Consultas</span>
           </Link>
+
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all font-bold mt-8 border border-transparent hover:border-red-100"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Cerrar Sesión</span>
+          </button>
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-y-auto">
-        <div className="bg-white/60 dark:bg-black/40 backdrop-blur-md rounded-3xl border border-neutral-200/50 dark:border-neutral-800/50 shadow-xl p-8 min-h-[80vh]">
+      <main className="flex-1 h-screen overflow-y-auto bg-[#F8F9FA] dark:bg-neutral-950 p-8">
+        <div className="max-w-[1600px] mx-auto min-h-full">
           {children}
         </div>
       </main>
     </div>
   );
 }
+

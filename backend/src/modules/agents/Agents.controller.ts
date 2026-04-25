@@ -25,7 +25,21 @@ export class AgentsController {
 
   create = async (req: Request, res: Response) => {
     try {
-      const newAgent = await this.agentsService.create(req.body);
+      const data = { ...req.body };
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+      if (files) {
+        if (files['profile_picture']) data.profile_picture = files['profile_picture'][0].path;
+        if (files['nid_picture']) data.nid_picture = files['nid_picture'][0].path;
+      }
+
+      // Convert string IDs to numbers
+      if (data.location_id) data.location_id = Number(data.location_id);
+      if (data.country_id) data.country_id = Number(data.country_id);
+      if (data.user_id) data.user_id = Number(data.user_id);
+      if (data.discount) data.discount = parseFloat(data.discount);
+
+      const newAgent = await this.agentsService.create(data);
       res.status(201).json(newAgent);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -34,7 +48,20 @@ export class AgentsController {
 
   update = async (req: Request, res: Response) => {
     try {
-      const updatedAgent = await this.agentsService.update(Number(req.params.id), req.body);
+      const data = { ...req.body };
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+      if (files) {
+        if (files['profile_picture']) data.profile_picture = files['profile_picture'][0].path;
+        if (files['nid_picture']) data.nid_picture = files['nid_picture'][0].path;
+      }
+
+      if (data.location_id) data.location_id = Number(data.location_id);
+      if (data.country_id) data.country_id = Number(data.country_id);
+      if (data.user_id) data.user_id = Number(data.user_id);
+      if (data.discount) data.discount = parseFloat(data.discount);
+
+      const updatedAgent = await this.agentsService.update(Number(req.params.id), data);
       res.json(updatedAgent);
     } catch (error: any) {
       res.status(400).json({ error: error.message });

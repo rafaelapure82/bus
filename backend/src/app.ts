@@ -18,11 +18,14 @@ import pagesRoutes from './modules/pages/Pages.routes';
 import blogsRoutes from './modules/blogs/Blogs.routes';
 import ratingsRoutes from './modules/ratings/Ratings.routes';
 import inquiriesRoutes from './modules/inquiries/Inquiries.routes';
+import vehiclesRoutes from './modules/vehicles/Vehicles.routes';
+import passangersRoutes from './modules/passangers/Passangers.routes';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 // Base Route
 app.get('/api/health', (req, res) => {
@@ -48,5 +51,9 @@ app.use('/api/pages', pagesRoutes);
 app.use('/api/blogs', blogsRoutes);
 app.use('/api/ratings', ratingsRoutes);
 app.use('/api/inquiries', inquiriesRoutes);
+app.use('/api/vehicles', vehiclesRoutes);
+app.use('/api/passangers', passangersRoutes);
+
+
 
 export default app;

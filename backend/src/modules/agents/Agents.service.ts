@@ -2,7 +2,13 @@ import prisma from '../../config/prisma';
 
 export class AgentsService {
   async findAll() {
-    return prisma.agents.findMany();
+    return prisma.agents.findMany({
+      include: {
+        country: true,
+        locations: true,
+        users: true
+      }
+    });
   }
 
   async findById(id: number) {

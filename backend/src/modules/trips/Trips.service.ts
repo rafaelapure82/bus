@@ -2,7 +2,16 @@ import prisma from '../../config/prisma';
 
 export class TripsService {
   async findAll() {
-    return prisma.trips.findMany();
+    return prisma.trips.findMany({
+      include: {
+        fleets: true,
+        schedules: true,
+        locations_trips_pick_location_idTolocations: true,
+        locations_trips_drop_location_idTolocations: true,
+        vehicles: true,
+        employees: true
+      }
+    });
   }
 
   async findById(id: number) {

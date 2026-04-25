@@ -2,7 +2,12 @@ import prisma from '../../config/prisma';
 
 export class EmployeesService {
   async findAll() {
-    return prisma.employees.findMany();
+    return prisma.employees.findMany({
+      include: {
+        country: true,
+        employeetypes: true
+      }
+    });
   }
 
   async findById(id: number) {
